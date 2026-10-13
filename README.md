@@ -1,37 +1,128 @@
-# Build-your-backend-with-Python-and-Flask
-Project overview
-In this final project, you'll use generative AI (GenAI) to design, build and validate the functions for a complete full-stack application, demonstrating how you can effectively use an AI-powered app to accelerate development while you remain in control of system logic and quality.
+# CodeCraftHub Backend API
 
-Your goal is to design and develop a personalized learning platform called CodeCraftHub using GenAI tools. This platform enables you to manage course listings in a learning system, including creating, reading, updating, and deleting (CRUD) them.
+A REST API built with Python and Flask for managing online courses.
+Course records are stored in a local JSON file.
 
-The project is divided into two parts. In the first part, you'll build the platform's backend by creating a functional REST API with full CRUD. In the second part, you'll build the platform's frontend by creating a dashboard user interface (UI) using either Bolt.new or Bolt.diy, an AI-powered web interface generator.
+## Features
 
-Part 1: CodeCraftHub: Building personalized learning for developers
-In Part 1, you will use GenAI to design and develop the backend of the CodeCraftHub platform. The project is available in three language options, each using a different framework: JavaScript with Node.js and Express, Python with Flask, and Java with Spring Boot. You can opt for any one of the three to complete Part 1 of this project:
+- Create, read, update, and delete courses (CRUD).
+- Validate course data and status values.
+- Return appropriate HTTP status codes and JSON errors.
+- Enable Cross-Origin Resource Sharing (CORS).
+- View course statistics by status.
 
-Final Project Part 1 [Option A - NodeJS]: CodeCraftHub: Building Personalized Learning for Developers
-Final Project Part 1 [Option B - Python]: CodeCraftHub: Building Personalized Learning for Developers
-Final Project Part 1 [Option C - Java]: CodeCraftHub: Building Personalized Learning for Developers
-Learning objectives
-By the end of Part 1, you'll have demonstrated your ability to:
+## Technologies
 
-Build a complete Create, Read, Update, Delete (CRUD) API that stores data in a JSON file, with no database required
-Test endpoints using curl to verify that they return clear, consistent HTTP responses
-Enable cross-origin resource sharing (CORS) so a browser-based frontend can call your API
-Document your work with a beginner-friendly README and optionally publish it to GitHub
-Tasks
-In Part 1, you will perform the following tasks:
+- Python
+- Flask
+- Flask-CORS
+- JSON file storage
 
-Confirm prerequisites, including the language runtime (JDK/Python/Node), Git, and curl
-Initialize the project by creating the folder and baseline files
-Generate your API with GenAI: CRUD over /api/courses using JSON file storage
-Add quality gates such as input validation, status enum, helpful error messages, and consistent JSON responses
-Enable CORS so the frontend can call the API from a browser
-Install dependencies and run the server locally
-Test with curl (POST/GET/PUT/DELETE) and verify status codes and response bodies
-Document the project with a simple README (overview, run steps, endpoints, troubleshooting)
-Optional explorations
-Optionally, you can also explore:
+## Project Structure
 
-Adding a /stats endpoint and simple search
-Pushing your work to GitHub for version control and to share your completed dashboard as part of your growing portfolio
+```text
+Build-your-backend-with-Python-and-Flask/
+├── app.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+└── data/
+    └── courses.json
+```
+
+## Setup
+
+Python 3.9 or newer is recommended, subject to dependency compatibility.
+
+Create and activate a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+## Run the API
+
+```bash
+python app.py
+```
+
+The development server runs at:
+
+`http://127.0.0.1:5000`
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/` | API welcome message |
+| GET | `/api/courses` | List all courses |
+| GET | `/api/courses/<id>` | Get one course |
+| POST | `/api/courses` | Create a course |
+| PUT | `/api/courses/<id>` | Update a course |
+| DELETE | `/api/courses/<id>` | Delete a course |
+| GET | `/api/stats` | Get course statistics |
+
+## Course Data
+
+Example JSON request body:
+
+```json
+{
+  "title": "Python for Beginners",
+  "description": "Learn Python fundamentals",
+  "instructor": "Alex Morgan",
+  "duration": 6,
+  "status": "Published"
+}
+```
+
+Required fields:
+
+- `title`: non-empty string
+- `description`: non-empty string
+- `instructor`: non-empty string
+- `duration`: positive integer
+- `status`: `Draft`, `Published`, or `Archived`
+
+## Example Requests
+
+Create a course:
+
+```bash
+curl -i -X POST http://127.0.0.1:5000/api/courses \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Python for Beginners","description":"Learn Python fundamentals","instructor":"Alex Morgan","duration":6,"status":"Published"}'
+```
+
+List courses:
+
+```bash
+curl -i http://127.0.0.1:5000/api/courses
+```
+
+Get statistics:
+
+```bash
+curl -i http://127.0.0.1:5000/api/stats
+```
+
+## Error Handling
+
+- `400 Bad Request`: invalid JSON or course data.
+- `404 Not Found`: course or endpoint not found.
+- `405 Method Not Allowed`: unsupported HTTP method.
+
+## Storage
+
+Course records are stored in `data/courses.json`. The file is initialized automatically if it does not exist.
+
+## Development Note
+
+This project is intended for learning and local development. The Flask development server is not intended for production deployment.
