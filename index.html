@@ -1,1 +1,375 @@
-<escape><!DOCTYPE html><html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>CodeCraftHub | Course Dashboard</title> <style> * { box-sizing: border-box; } body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6fb; color: #20253a; } header { background: #202744; color: white; padding: 24px 6%; } header h1 { margin: 0 0 6px; font-size: 26px; } header p { margin: 0; color: #cbd2ea; } main { max-width: 1150px; margin: 32px auto; padding: 0 22px; } .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; } button { border: 0; border-radius: 8px; padding: 11px 16px; font-weight: 600; cursor: pointer; } .primary { background: #5b5ce2; color: white; } .secondary { background: #e9ebf5; color: #303752; } .danger { background: #fff0f0; color: #bd3030; } .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; } .stat, .panel { background: white; border: 1px solid #e7e9f2; border-radius: 14px; padding: 22px; box-shadow: 0 3px 12px #18234a08; } .stat p { color: #727990; margin: 0 0 12px; } .stat strong { font-size: 30px; } .panel h2 { margin: 0 0 18px; font-size: 19px; } .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; } input, select, textarea { width: 100%; padding: 11px 12px; border: 1px solid #d9ddeb; border-radius: 8px; font: inherit; background: white; } .filters input { flex: 1; min-width: 180px; } .filters select { width: auto; min-width: 145px; } .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; text-align: left; } th, td { padding: 14px 10px; border-bottom: 1px solid #edf0f6; vertical-align: top; } th { color: #777e94; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; } td { font-size: 14px; } .muted { color: #777e94; } .status { display: inline-block; border-radius: 20px; padding: 5px 9px; font-size: 12px; background: #eef0ff; color: #5052c5; } .status.published { background: #e5f8ed; color: #187849; } .status.archived { background: #f0f1f4; color: #626879; } .actions { display: flex; gap: 6px; } .actions button { padding: 7px 9px; } #message { margin: 0 0 18px; font-size: 14px; } .error { color: #c02d35; } .success { color: #187849; } .empty { text-align: center; padding: 35px 12px; color: #777e94; } dialog { border: 0; border-radius: 16px; padding: 0; width: min(520px, calc(100% - 28px)); box-shadow: 0 20px 70px #12182d40; } dialog::backdrop { background: #171c31a8; } .modal-head, .modal-body, .modal-foot { padding: 20px 24px; } .modal-head { border-bottom: 1px solid #edf0f6; } .modal-head h2 { margin: 0; } .modal-body { display: grid; gap: 14px; } .field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; } .modal-foot { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #edf0f6; } @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } main { margin-top: 20px; } } @media (max-width: 420px) { .stats { grid-template-columns: 1fr 1fr; gap: 9px; } .stat { padding: 15px; } .stat strong { font-size: 24px; } } </style> </head> <body> <header> <h1>CodeCraftHub</h1> <p>Course Management Dashboard</p> </header> <main> <div class="toolbar"> <div> <h2 style="margin:0 0 5px">Overview</h2> <span class="muted" id="connection">Connecting to API…</span> </div> <div style="display:flex;gap:10px"> <button class="secondary" id="refresh">Refresh</button> <button class="primary" id="add">+ Add New Course</button> </div> </div><p id="message" role="status"></p><section class="stats">        </section><section class="panel">                                                                  </section></main><dialog id="courseDialog"> <form id="courseForm"> <div class="modal-head"><h2 id="formTitle">Add Course</h2></div> <div class="modal-body"> <div class="field"><label for="title">Course title *</label><input id="title" name="title" required maxlength="120"></div> <div class="field"><label for="description">Description *</label><textarea id="description" name="description" required rows="3"></textarea></div> <div class="field"><label for="instructor">Instructor *</label><input id="instructor" name="instructor" required></div> <div class="field"><label for="duration">Duration (hours) *</label><input id="duration" name="duration" type="number" min="1" step="1" required></div> <div class="field"><label for="status">Status *</label><select id="status" name="status" required><option>Draft</option><option>Published</option><option>Archived</option></select></div> </div> <div class="modal-foot"> <button class="secondary" type="button" id="cancel">Cancel</button> <button class="primary" type="submit" id="save">Save Course</button> </div> </form> </dialog><script> const API = "http://127.0.0.1:5000/api</body> </html></escape>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodeCraftHub | Course Dashboard</title>
+<style>
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #202840;
+  background: #f5f7fc;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+header {
+  background: linear-gradient(120deg, #242d55, #4e5fba);
+  color: white; padding: 27px max(24px, calc((100% - 1160px)/2));
+}
+header h1 { margin: 0 0 5px; font-size: 27px; }
+header p { margin: 0; color: #e1e6ff; }
+main { max-width: 1160px; margin: 30px auto; padding: 0 22px; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+h2 { font-size: 21px; }
+.muted { color: #737d95; font-size: 13px; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; border: 0; border-radius: 9px; padding: 11px 15px; font-weight: 600; }
+.primary { background: #4d5ed0; color: white; }
+.secondary { background: white; color: #303951; border: 1px solid #dfe4ef; }
+.danger { color: #b42332; background: #fff0f1; }
+button:disabled { opacity: .55; cursor: wait; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat, .panel { background: white; border: 1px solid #e8ebf3; border-radius: 14px; box-shadow: 0 5px 20px #20284008; }
+.stat { padding: 20px; }
+.stat span { display: block; color: #737d95; font-size: 13px; }
+.stat strong { display: block; font-size: 30px; margin-top: 10px; }
+.panel { overflow: hidden; }
+.panel-head { padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid #edf0f6; }
+.panel-head h2 { margin: 0; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; }
+input, select, textarea { border: 1px solid #dce2ee; border-radius: 8px; padding: 10px 12px; background: white; color: #202840; }
+#search { min-width: 210px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; text-align: left; }
+th, td { padding: 15px 20px; border-bottom: 1px solid #edf0f6; font-size: 14px; }
+th { color: #737d95; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; background: #fafbfe; }
+td .course-title { font-weight: 650; }
+td .description { color: #737d95; margin-top: 4px; max-width: 310px; }
+.row-actions { display: flex; gap: 7px; }
+.row-actions button { padding: 7px 10px; font-size: 12px; }
+.status { display: inline-block; border-radius: 20px; padding: 5px 9px; font-size: 12px; background: #eef0f6; }
+.status.Published { background: #e5f7ed; color: #187849; }
+.status.Draft { background: #fff4d9; color: #8b6500; }
+.status.Archived { background: #edf0f6; color: #596174; }
+#message { margin: 0 0 14px; font-size: 14px; }
+.error { color: #c02d35; }
+.success { color: #187849; }
+.empty { text-align: center; padding: 35px 12px; color: #777e94; }
+dialog { border: 0; border-radius: 16px; padding: 0; width: min(540px, calc(100% - 28px)); box-shadow: 0 20px 70px #12182d40; }
+dialog::backdrop { background: #171c31a8; }
+.modal-head, .modal-body, .modal-foot { padding: 20px 24px; }
+.modal-head { border-bottom: 1px solid #edf0f6; }
+.modal-head h2 { margin: 0; }
+.modal-body { display: grid; gap: 14px; }
+.field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+.field input, .field textarea, .field select { width: 100%; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #edf0f6; }
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  main { margin-top: 20px; }
+}
+@media (max-width: 420px) {
+  .stats { gap: 9px; }
+  .stat { padding: 15px; }
+  .stat strong { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>CodeCraftHub</h1>
+  <p>Course Management Dashboard</p>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div>
+      <h2 style="margin:0 0 5px">Overview</h2>
+      <span class="muted" id="connection">Connecting to API…</span>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="refresh">Refresh</button>
+      <button class="primary" id="add">+ Add New Course</button>
+    </div>
+  </div>
+
+  <p id="message" role="status"></p>
+
+  <section class="stats">
+    <div class="stat"><span>Total Courses</span><strong id="total">0</strong></div>
+    <div class="stat"><span>Published</span><strong id="published">0</strong></div>
+    <div class="stat"><span>Drafts</span><strong id="drafts">0</strong></div>
+    <div class="stat"><span>Archived</span><strong id="archived">0</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Courses</h2>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search courses…">
+        <select id="filter">
+          <option value="">All statuses</option>
+          <option>Published</option>
+          <option>Draft</option>
+          <option>Archived</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Course</th><th>Instructor</th><th>Duration</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="courseRows">
+          <tr><td colspan="5" class="empty">Loading courses…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<dialog id="courseDialog">
+  <form id="courseForm">
+    <div class="modal-head"><h2 id="formTitle">Add Course</h2></div>
+    <div class="modal-body">
+      <div class="field"><label for="title">Course title *</label><input id="title" name="title" required maxlength="120"></div>
+      <div class="field"><label for="description">Description *</label><textarea id="description" name="description" required rows="3"></textarea></div>
+      <div class="field"><label for="instructor">Instructor *</label><input id="instructor" name="instructor" required></div>
+      <div class="field"><label for="duration">Duration (hours) *</label><input id="duration" name="duration" type="number" min="1" step="1" required></div>
+      <div class="field"><label for="status">Status *</label><select id="status" name="status" required><option>Draft</option><option>Published</option><option>Archived</option></select></div>
+    </div>
+    <div class="modal-foot">
+      <button class="secondary" type="button" id="cancel">Cancel</button>
+      <button class="primary" type="submit" id="save">Save Course</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+"use strict";
+
+const API = "http://127.0.0.1:5000/api";
+const $ = id => document.getElementById(id);
+let courses = [];
+let editingId = null;
+
+function showMessage(message, type = "") {
+  $("message").textContent = message;
+  $("message").className = type;
+}
+
+async function request(path, options = {}) {
+  const response = await fetch(API + path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; }
+  catch { data = { message: text }; }
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `Request failed (${response.status})`);
+  }
+  return data;
+}
+
+function courseList(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.courses)) return data.courses;
+  if (Array.isArray(data.data)) return data.data;
+  return [];
+}
+
+function courseId(course) {
+  return course.id ?? course.course_id;
+}
+
+function updateStats(stats) {
+  const counts = { Published: 0, Draft: 0, Archived: 0 };
+  courses.forEach(course => {
+    if (Object.prototype.hasOwnProperty.call(counts, course.status)) {
+      counts[course.status]++;
+    }
+  });
+
+  $("total").textContent = stats.total ?? stats.total_courses ?? courses.length;
+  $("published").textContent = stats.published ?? stats.published_courses ?? counts.Published;
+  $("drafts").textContent = stats.drafts ?? stats.draft_courses ?? counts.Draft;
+  $("archived").textContent = stats.archived ?? stats.archived_courses ?? counts.Archived;
+
+  if (stats.by_status) {
+    $("published").textContent = stats.by_status.Published ?? counts.Published;
+    $("drafts").textContent = stats.by_status.Draft ?? counts.Draft;
+    $("archived").textContent = stats.by_status.Archived ?? counts.Archived;
+  }
+}
+
+function makeCell(text) {
+  const td = document.createElement("td");
+  td.textContent = text ?? "—";
+  return td;
+}
+
+function renderCourses() {
+  const query = $("search").value.trim().toLowerCase();
+  const status = $("filter").value;
+  const filtered = courses.filter(course => {
+    const matchesText = [course.title, course.description, course.instructor]
+      .some(value => String(value ?? "").toLowerCase().includes(query));
+    return matchesText && (!status || course.status === status);
+  });
+
+  const tbody = $("courseRows");
+  tbody.replaceChildren();
+
+  if (!filtered.length) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.colSpan = 5;
+    td.className = "empty";
+    td.textContent = courses.length ? "No courses match your search." : "No courses yet. Select “Add New Course” to create one.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  filtered.forEach(course => {
+    const tr = document.createElement("tr");
+    const titleCell = document.createElement("td");
+    const title = document.createElement("div");
+    title.className = "course-title";
+    title.textContent = course.title || "Untitled course";
+    const description = document.createElement("div");
+    description.className = "description";
+    description.textContent = course.description || "";
+    titleCell.append(title, description);
+
+    const statusCell = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "status " + (course.status || "");
+    badge.textContent = course.status || "Unknown";
+    statusCell.appendChild(badge);
+
+    const actionsCell = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+    const edit = document.createElement("button");
+    edit.className = "secondary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => openEditor(course));
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", () => deleteCourse(course));
+    actions.append(edit, remove);
+    actionsCell.appendChild(actions);
+
+    tr.append(
+      titleCell,
+      makeCell(course.instructor),
+      makeCell(course.duration == null ? "—" : `${course.duration} hours`),
+      statusCell,
+      actionsCell
+    );
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadDashboard() {
+  $("connection").textContent = "Connecting to API…";
+  $("refresh").disabled = true;
+  try {
+    const [courseData, statsData] = await Promise.all([
+      request("/courses"),
+      request("/stats")
+    ]);
+    courses = courseList(courseData);
+    updateStats(statsData);
+    renderCourses();
+    $("connection").textContent = "Connected to API";
+    showMessage("");
+  } catch (error) {
+    $("connection").textContent = "API connection failed";
+    $("courseRows").innerHTML = '<tr><td colspan="5" class="empty">Could not load courses. Check that Flask is running and see the message above.</td></tr>';
+    showMessage(error.message + " — Check the Flask server and API URL.", "error");
+    console.error("Dashboard loading failed:", error);
+  } finally {
+    $("refresh").disabled = false;
+  }
+}
+
+function openEditor(course = null) {
+  editingId = course ? courseId(course) : null;
+  $("courseForm").reset();
+  $("formTitle").textContent = course ? "Edit Course" : "Add Course";
+  if (course) {
+    $("title").value = course.title || "";
+    $("description").value = course.description || "";
+    $("instructor").value = course.instructor || "";
+    $("duration").value = course.duration ?? "";
+    $("status").value = course.status || "Draft";
+  }
+  $("courseDialog").showModal();
+}
+
+async function deleteCourse(course) {
+  const id = courseId(course);
+  if (id == null) {
+    showMessage("This course has no ID, so it cannot be deleted.", "error");
+    return;
+  }
+  if (!confirm(`Delete "${course.title || "this course"}"? This cannot be undone.`)) return;
+  try {
+    await request(`/courses/${encodeURIComponent(id)}`, { method: "DELETE" });
+    showMessage("Course deleted successfully.", "success");
+    await loadDashboard();
+  } catch (error) {
+    showMessage("Could not delete course: " + error.message, "error");
+  }
+}
+
+$("add").addEventListener("click", () => openEditor());
+$("refresh").addEventListener("click", loadDashboard);
+$("cancel").addEventListener("click", () => $("courseDialog").close());
+$("search").addEventListener("input", renderCourses);
+$("filter").addEventListener("change", renderCourses);
+
+$("courseForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const payload = {
+    title: $("title").value.trim(),
+    description: $("description").value.trim(),
+    instructor: $("instructor").value.trim(),
+    duration: Number($("duration").value),
+    status: $("status").value
+  };
+
+  $("save").disabled = true;
+  try {
+    const path = editingId == null
+      ? "/courses"
+      : `/courses/${encodeURIComponent(editingId)}`;
+    await request(path, {
+      method: editingId == null ? "POST" : "PUT",
+      body: JSON.stringify(payload)
+    });
+    $("courseDialog").close();
+    showMessage(editingId == null ? "Course created successfully." : "Course updated successfully.", "success");
+    await loadDashboard();
+  } catch (error) {
+    showMessage("Could not save course: " + error.message, "error");
+  } finally {
+    $("save").disabled = false;
+  }
+});
+
+loadDashboard();
+</script>
+</body>
+</html>
